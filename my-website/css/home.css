@@ -152,7 +152,11 @@
       right: 30px;
       font-size: 30px;
     }
-
+.mobitv_footer {
+    text-align: center;
+    display: inline-block;
+    line-height: 30px;
+}
 /* MOBILE DISPLAY START */
 @media (max-width: 768px) {
   .navbar {
@@ -289,10 +293,5 @@ margin: 15px 0 15px 1.5%;
 width: 120px;
 height: 40px;
     }
-    .mobitv_footer {
-    text-align: center;
-    display: inline-block;
-    line-height: 30px;
-}
 }
 
