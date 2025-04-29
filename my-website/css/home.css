@@ -289,9 +289,10 @@ margin: 15px 0 15px 1.5%;
 width: 120px;
 height: 40px;
     }
-}
-.mobitv_footer {
+    .mobitv_footer {
     text-align: left;
     display: inline-block;
     line-height: 30px;
 }
+}
+
