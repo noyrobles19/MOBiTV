@@ -2,78 +2,104 @@ const API_KEY = '4805fee141236fd075133fd593f71e48';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/original';
 
-let currentItem = null; // Store currently selected movie
+let currentItem = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  fetchTrendingMovies();
+document.addEventListener('DOMContentLoaded', async () => {
+  const trendingMovies = await fetchMovies('/trending/movie/week');
+  const popularMovies = await fetchMovies('/movie/popular');
+
+  if (trendingMovies.length > 0) {
+    displayBanner(trendingMovies[0]);
+  }
+
+  displayList(trendingMovies, 'movies-list');
+  displayList(popularMovies, 'popular-list');
 });
 
-// Fetch trending movies
-async function fetchTrendingMovies() {
-  try {
-    const response = await fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}`);
-    const data = await response.json();
-    displayMovies(data.results);
-  } catch (error) {
-    console.error('Failed to fetch trending movies:', error);
-  }
+async function fetchMovies(endpoint) {
+  const res = await fetch(`${BASE_URL}${endpoint}?api_key=${API_KEY}`);
+  const data = await res.json();
+  return data.results;
 }
 
-// Display movie cards in a grid
-function displayMovies(movies) {
-  const container = document.getElementById('movies-list');
+function displayBanner(movie) {
+  document.getElementById('banner').style.backgroundImage = `url(${IMG_URL}${movie.backdrop_path})`;
+  document.getElementById('banner-title').textContent = movie.title;
+}
+
+function displayList(movies, containerId) {
+  const container = document.getElementById(containerId);
   container.innerHTML = '';
 
   movies.forEach(movie => {
-    const tile = document.createElement('div');
-    tile.className = 'movie-tile';
-
     const img = document.createElement('img');
-    img.src = IMG_URL + movie.poster_path;
+    img.src = `${IMG_URL}${movie.poster_path}`;
     img.alt = movie.title;
-    img.addEventListener('click', () => showModal(movie));
-
-    tile.appendChild(img);
-    container.appendChild(tile);
+    img.onclick = () => showDetails(movie);
+    container.appendChild(img);
   });
 }
 
-// Show modal with movie details
-function showModal(movie) {
-  currentItem = { ...movie, media_type: 'movie' }; // Store current movie
-
+function showDetails(movie) {
+  currentItem = { ...movie, media_type: 'movie' };
   document.getElementById('modal-title').textContent = movie.title;
   document.getElementById('modal-description').textContent = movie.overview;
-  document.getElementById('modal-image').src = IMG_URL + movie.poster_path;
-
+  document.getElementById('modal-image').src = `${IMG_URL}${movie.poster_path}`;
   document.getElementById('modal').style.display = 'flex';
-
-  changeServer(); // Set default server (vidsrc.cc)
+  changeServer();
 }
 
-// Close modal
+function changeServer() {
+  const server = document.getElementById('server').value;
+  const type = currentItem.media_type === 'movie' ? 'movie' : 'tv';
+  const id = currentItem.id;
+  let embedURL = '';
+
+  if (server === 'vidsrc.cc') {
+    embedURL = `https://vidsrc.cc/v2/embed/${type}/${id}`;
+  } else if (server === 'vidsrc.me') {
+    embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${id}`;
+  } else if (server === 'player.videasy.net') {
+    embedURL = `https://player.videasy.net/${type}/${id}`;
+  }
+
+  document.getElementById('modal-video').src = embedURL;
+}
+
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
   document.getElementById('modal-video').src = '';
 }
 
-// Handle server switching
-function changeServer() {
-  const server = document.getElementById('server').value;
-  const type = currentItem.media_type === 'movie' ? 'movie' : 'tv';
-  const tmdbId = currentItem.id;
+function openSearchModal() {
+  document.getElementById('search-modal').style.display = 'flex';
+  document.getElementById('search-input').focus();
+}
 
-  let embedURL = '';
+function closeSearchModal() {
+  document.getElementById('search-modal').style.display = 'none';
+  document.getElementById('search-results').innerHTML = '';
+}
 
-  if (server === 'vidsrc.cc') {
-    embedURL = `https://vidsrc.cc/v2/embed/${type}/${tmdbId}`;
-  } else if (server === 'vidsrc.me') {
-    embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${tmdbId}`;
-  } else if (server === 'player.videasy.net') {
-    embedURL = `https://player.videasy.net/${type}/${tmdbId}`;
-  }
+async function searchTMDB() {
+  const query = document.getElementById('search-input').value;
+  if (!query.trim()) return;
 
-  const iframe = document.getElementById('modal-video');
-  iframe.src = embedURL;
-  iframe.style.display = 'block';
+  const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}`);
+  const data = await res.json();
+
+  const container = document.getElementById('search-results');
+  container.innerHTML = '';
+
+  data.results.forEach(item => {
+    if (!item.poster_path) return;
+    const img = document.createElement('img');
+    img.src = `${IMG_URL}${item.poster_path}`;
+    img.alt = item.title || item.name;
+    img.onclick = () => {
+      closeSearchModal();
+      showDetails(item);
+    };
+    container.appendChild(img);
+  });
 }
