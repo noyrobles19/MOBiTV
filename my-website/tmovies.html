@@ -45,12 +45,16 @@
       <div class="server-selector">
         <label for="server">Change Server:</label>
         <select id="server" onchange="changeServer()">
-          <option value="vidsrc.to">vidsrc.to</option>
+          <option value="vidsrc.cc" selected>vidsrc.cc</option> <!-- Default -->
           <option value="vidsrc.me">vidsrc.me</option>
           <option value="player.videasy.net">player.videasy.net</option>
         </select>
       </div>
-      <iframe id="modal-video" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+      <iframe
+        id="modal-video"
+        allowfullscreen
+        sandbox="allow-scripts allow-same-origin allow-forms"
+      ></iframe>
     </div>
   </div>
 </body>
