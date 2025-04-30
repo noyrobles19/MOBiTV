@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trending Movies - MOBiTV</title>
-  <link rel="stylesheet" href="css/tmovies.css" />
-  <script defer src="js/tmovies.js"></script>
+  <title>MOBiTV - Trending Movies</title>
+  <link rel="stylesheet" href="tmovies.css" />
+  <script defer src="tmovies.js"></script>
 </head>
 
 <body>
@@ -16,34 +16,41 @@
     </a>
     <div class="nav-links">
       <a href="index.html">Home</a>
+      <input type="text" class="search-bar" placeholder="Search..." />
     </div>
   </div>
 
   <!-- Banner -->
-  <div class="banner" style="background-image: url('https://image.tmdb.org/t/p/original/8uVKfYzJ3qXy9PzUiv68LhmO3gP.jpg');">
+  <div class="banner">
     <h1>Trending Movies</h1>
   </div>
 
-  <!-- Movies Grid Section -->
-  <div class="row">
+  <!-- Movie Grid -->
+  <div class="row" id="movies-section">
     <h2>Now Trending</h2>
-    <div class="grid" id="movies-grid"></div>
+    <div class="grid" id="movies-list"></div>
   </div>
 
   <!-- Modal -->
-  <div class="modal" id="modal" role="dialog" aria-hidden="true">
+  <div class="modal" id="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()" aria-label="Close Modal">&times;</span>
       <div class="modal-body">
         <img id="modal-image" src="" alt="Movie Poster" />
         <div class="modal-text">
           <h2 id="modal-title"></h2>
-          <div class="stars" id="modal-rating"></div>
           <p id="modal-description"></p>
         </div>
       </div>
-      <iframe id="modal-video" width="100%" height="400" frameborder="0" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-      <p id="video-error" style="color: red; display: none;">This media is unavailable at the moment.</p>
+      <div class="server-selector">
+        <label for="server">Change Server:</label>
+        <select id="server" onchange="changeServer()">
+          <option value="vidsrc.to">vidsrc.to</option>
+          <option value="vidsrc.me">vidsrc.me</option>
+          <option value="player.videasy.net">player.videasy.net</option>
+        </select>
+      </div>
+      <iframe id="modal-video" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
     </div>
   </div>
 </body>
