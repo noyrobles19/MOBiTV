@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trending Movies - MOBiTV</title>
+  <link rel="stylesheet" href="tmovies.css" />
+  <script defer src="tmovies.js"></script>
+  <style>
+    /* Override list display to be grid for trending-movies only */
+    #movies-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+    }
+
+    #movies-list img {
+      width: 100%;
+      border-radius: 8px;
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    #movies-list img:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="index.html">
+      <img src="/logo/mobitv.png" alt="MOBiTV Logo" id="movie-logo" />
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <input type="text" class="search-bar" placeholder="Search..." aria-label="Search for a movie or TV show" />
+    </div>
+  </div>
+
+  <!-- Banner -->
+  <div class="banner" style="background-image: url('https://image.tmdb.org/t/p/original/qnqGbB22YJ7dSs4o6M7exTpNxPz.jpg');">
+    <h1 id="banner-title">Trending Movies</h1>
+  </div>
+
+  <!-- Trending Movies Grid Section -->
+  <div class="row" id="movies-section">
+    <h2>Top Trending This Week</h2>
+    <div class="list" id="movies-list" role="region" aria-labelledby="movies-list-title"></div>
+  </div>
+
+  <!-- Modal for movie details -->
+  <div class="modal" id="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal-content">
+      <span class="close" id="close-modal" aria-label="Close Modal" style="color: red;">&times;</span>
+      <div class="modal-body">
+        <img id="modal-image" src="" alt="Movie Poster" />
+        <div class="modal-text">
+          <h2 id="modal-title"></h2>
+          <div class="stars" id="modal-rating"></div>
+          <p id="modal-description"></p>
+        </div>
+      </div>
+      <div class="server-selector">
+        <label for="server" aria-label="Change video server">Change Server:</label>
+        <select id="server" onchange="changeServer()" aria-label="Select a video server">
+          <option value="vidsrc.cc">Vidsrc.cc</option>
+          <option value="vidsrc.me">Vidsrc.me</option>
+          <option value="player.videasy.net">Player.Videasy.net</option>
+        </select>
+      </div>
+      <iframe id="modal-video" width="100%" height="315" frameborder="0" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms" aria-label="Video Player"></iframe>
+    </div>
+  </div>
+</body>
+</html>
