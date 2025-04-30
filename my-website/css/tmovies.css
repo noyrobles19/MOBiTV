@@ -329,9 +329,10 @@
     gap 8px;
   }
      Logo styles 
+    /* Logo styles */
 #movie-logo {
-margin 15px 0 15px 1.5%;
-width 120px;
-height 40px;
+margin: 15px 0 15px 1.5%;
+width: 120px;
+height: 40px;
     }
 }
