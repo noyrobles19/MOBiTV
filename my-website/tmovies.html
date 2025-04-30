@@ -7,9 +7,7 @@
   <link rel="stylesheet" href="css/tmovies.css" />
   <script defer src="js/tmovies.js"></script>
 </head>
-
 <body>
-  <!-- Navbar -->
   <div class="navbar">
     <a href="index.html">
       <img src="/logo/mobitv.png" alt="MOBiTV Logo" id="movie-logo" />
@@ -20,19 +18,17 @@
     </div>
   </div>
 
-  <!-- Banner -->
-  <div class="banner">
+  <div class="banner" id="banner">
     <h1>Trending Movies</h1>
   </div>
 
-  <!-- Movie Grid -->
   <div class="row" id="movies-section">
-    <h2>Now Trending</h2>
-    <div class="grid" id="movies-list"></div>
+    <h2>Now Popular</h2>
+    <div class="grid" id="movies-list" role="region" aria-label="List of trending movies"></div>
   </div>
 
   <!-- Modal -->
-  <div class="modal" id="modal">
+  <div class="modal" id="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
     <div class="modal-content">
       <span class="close" onclick="closeModal()" aria-label="Close Modal">&times;</span>
       <div class="modal-body">
@@ -43,18 +39,14 @@
         </div>
       </div>
       <div class="server-selector">
-        <label for="server">Change Server:</label>
+        <label for="server">Choose Server:</label>
         <select id="server" onchange="changeServer()">
-          <option value="vidsrc.cc" selected>vidsrc.cc</option> <!-- Default -->
-          <option value="vidsrc.me">vidsrc.me</option>
-          <option value="player.videasy.net">player.videasy.net</option>
+          <option value="vidsrc.cc" selected>Vidsrc.cc</option>
+          <option value="vidsrc.me">Vidsrc.me</option>
+          <option value="player.videasy.net">Player.Videasy.net</option>
         </select>
       </div>
-      <iframe
-        id="modal-video"
-        allowfullscreen
-        sandbox="allow-scripts allow-same-origin allow-forms"
-      ></iframe>
+      <iframe id="modal-video" width="100%" height="315" frameborder="0" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
     </div>
   </div>
 </body>
