@@ -1,14 +1,10 @@
 
 const API_KEY = window.API_KIFE;
 
-const movieGrid = document.getElementById('movie-grid');
-const seriesGrid = document.getElementById('series-grid');
-const pmovieGrid = document.getElementById('pmovie-grid');
-const pseriesGrid = document.getElementById('pseries-grid');
+const movieGrid = document.getElementById('movies-grid');
+const pmovieGrid = document.getElementById('pmovies-grid');
 const genreList = document.getElementById('genre-list');
 const modal = document.getElementById('modal');
-const modalPlayer = document.getElementById('modal-player');
-const closeModal = document.getElementById('close-modal');
 const searchBar = document.getElementById('searchBar');  
 const searchResults = document.getElementById('searchResults');
 const searchB = document.getElementById('searchBar-cont');
@@ -283,50 +279,8 @@ fetchTopAiringMovies();
       console.error('Error fetching top airing TV shows:', error);
     }
   }
-  
-  // Function to fetch and display Most Watched TV Shows (Trending TV Shows)
-  async function fetchMostWatchedSeries() {
-    try {
-      const response = await fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=en-US`);
-  
-      if (!response.ok) {
-        throw new Error('Error fetching trending TV shows: ' + response.statusText);
-      }
-  
-      const data = await response.json();
-      const mostWatchedGrid = document.getElementById('most-watched-grid');
-      mostWatchedGrid.innerHTML = ''; // Clear previous results
-  
-      data.results.forEach((series) => {
-        const seriesCard = document.createElement('div');
-        seriesCard.className = 'series-card';
-  
-        // Create star rating system for trending series
-        const starRating = getStarRating(series.vote_average);
-  
-        seriesCard.innerHTML = `
-          <div class="series-poster">
-            <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="series-image">
-            <div class="rating-container">
-              <div class="stars">${starRating}</div>
-              <div class="rating-number">${series.vote_average}</div>
-            </div>
-          </div>
-        `;
-  
-        seriesCard.onclick = () => watchNow(series.id, 'series');
-        mostWatchedGrid.appendChild(seriesCard);
-      });
-    } catch (error) {
-      console.error('Error fetching trending TV shows:', error);
-    }
-  }
 
-// Function to handle the modal (optional)
-// You can implement this to show more details about the series when clicked
-// Call the functions to load the data when the page loads
-fetchTopAiringSeries();
-fetchMostWatchedSeries();
+
 
 async function searchMoviesAndSeries(query) {
   try {
@@ -461,14 +415,11 @@ const contentElement = document.getElementById("spot-details");
 async function fetchSpotlightMoviesAndSeries() {
   try {
     // Fetching top-rated series and upcoming movies (or any other criteria you prefer)
-    const seriesResponse = await fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}`);
-    const moviesResponse = await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`);
-
-    const seriesData = await seriesResponse.json();
+    const moviesResponse = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&sort_by=release_date.desc&with_watch_providers=8&watch_region=US`);
     const moviesData = await moviesResponse.json();
 
     // Combine series and movies into one list
-    spotlightList = [...seriesData.results, ...moviesData.results];
+    spotlightList = [...moviesData.results];
 
   // Remove 'show' class to restart animation
     contentElement.classList.remove("show");

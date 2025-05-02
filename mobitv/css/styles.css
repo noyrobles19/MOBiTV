@@ -1697,7 +1697,7 @@ a:hover {
 /* Define ang custom font gamit ang @font-face */
 @font-face {
   font-family: 'Fulcher 3D Font';  /* Name sa imong font */
-  src: url('FulcherExtruderight-e9pEx.otf') format('truetype'); /* Path sa font file */
+  src: url('../fonts/FulcherExtruderight-e9pEx.otf') format('truetype'); /* Path sa font file */
 }
 
 #movies h2 {

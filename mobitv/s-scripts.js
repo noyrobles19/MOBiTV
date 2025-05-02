@@ -1,14 +1,9 @@
 
 const API_KEY = window.API_KIFE;
 
-const movieGrid = document.getElementById('movie-grid');
 const seriesGrid = document.getElementById('series-grid');
-const pmovieGrid = document.getElementById('pmovie-grid');
-const pseriesGrid = document.getElementById('pseries-grid');
+const pseriesGrid = document.getElementById('kseries-grid');
 const genreList = document.getElementById('genre-list');
-const modal = document.getElementById('modal');
-const modalPlayer = document.getElementById('modal-player');
-const closeModal = document.getElementById('close-modal');
 const searchBar = document.getElementById('searchBar');  
 const searchResults = document.getElementById('searchResults');
 const searchB = document.getElementById('searchBar-cont');
@@ -125,9 +120,9 @@ async function fetchPopularMovies() {
   }
 }
 
-async function fetchPopularSeries() {
+async function fetchTrendingKseries() {
   try {
-    const response = await fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&language=en-US&page=1`);
+    const response = await fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&with_original_language=ko&with_genres=18&page=1`);
     const data = await response.json();
 
     if (!data.results) throw new Error("No results found");
@@ -137,7 +132,7 @@ async function fetchPopularSeries() {
     // Fetch more pages if we don't have 20 valid series
     let page = 2;
     while (filteredSeries.length < 20) {
-      const moreResponse = await fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&language=en-US&page=${page}`);
+      const moreResponse = await fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&sort_by=popularity.desc&with_original_language=ko&with_genres=18&page=${page}`);
       const moreData = await moreResponse.json();
 
       if (!moreData.results.length) break; // Stop if no more series are available
@@ -176,32 +171,53 @@ async function fetchPopularSeries() {
 
 //UPCOMING
 async function fetchUpcomingMovies() {
-  const response = await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`);
-  const data = await response.json();
-  
-  const upcomingGrid = document.getElementById('upcoming-movies-grid');
-  upcomingGrid.innerHTML = ''; // Clear previous results
+  try {
+    const response = await fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&first_air_date.gte=2025-01-01&sort_by=first_air_date.asc&page=1`);
+    const data = await response.json();
 
-  data.results.forEach((movie) => {
-    const movieCard = document.createElement('div');
-    movieCard.className = 'movie-card';
+    if (!data.results) throw new Error("No results found");
 
-    // Generate star rating based on movie vote_average
-    const starRating = getStarRating(movie.vote_average);
+    let filteredSeries = data.results.filter(series => series.poster_path !== null);
 
-    movieCard.innerHTML = `
-      <div class="movie-poster">
-        <img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" alt="${movie.title}" class="movie-image">
-        <div class="rating-container">
-          <div class="star">${starRating}</div>
-          <div class="rating-number">${movie.vote_average}</div>
+    // Fetch more pages if we don't have 20 valid series
+    let page = 2;
+    while (filteredSeries.length < 20) {
+      const moreResponse = await fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&first_air_date.gte=2025-01-01&sort_by=first_air_date.asc&page=${page}`);
+      const moreData = await moreResponse.json();
+
+      if (!moreData.results.length) break; // Stop if no more series are available
+
+      filteredSeries = [...filteredSeries, ...moreData.results.filter(series => series.poster_path !== null)];
+      page++;
+    }
+
+    // Ensure only 20 series are displayed
+    filteredSeries = filteredSeries.slice(0, 20);
+    const upcomingGrid = document.getElementById('upcoming-movies-grid');
+    upcomingGrid.innerHTML = '';
+    filteredSeries.forEach((series) => {
+      const seriesCard = document.createElement('div');
+      seriesCard.className = 'series-card';
+
+      // Generate star rating
+      const starRating = getStarRating(series.vote_average);
+
+      seriesCard.innerHTML = `
+        <div class="series-poster">
+          <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="series-image">
+          <div class="rating-container">
+            <div class="star">${starRating}</div> <!-- Stars for rating -->
+            <div class="rating-number">${series.vote_average.toFixed(1)}</div> <!-- Numeric score -->
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
-    movieCard.onclick = () => watchNow(movie.id, 'movie');
-    upcomingGrid.appendChild(movieCard);
-  });
+      seriesCard.onclick = () => watchNow(series.id, 'series');
+      upcomingGrid.appendChild(seriesCard);
+    });
+  } catch (error) {
+    console.error("Error fetching popular series:", error);
+  }
 }
 
 //HOME END >>>>>>>>>>>>>>>>>>>>
@@ -679,13 +695,13 @@ async function fetchAnimationTVShows() {
             <div class="movie-poster">
               <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="movie-image">
               <div class="rating-container">
-                <div class="stars">${starRating}</div>
+                <div class="star">${starRating}</div>
                 <div class="rating-number">${series.vote_average}</div>
               </div>
             </div>
           `;
   
-          seriesCard.onclick = () => openSeriesModal(series.id); // You can implement this modal logic
+          seriesCard.onclick = () => watchNow(series.id, 'series'); // You can implement this modal logic
           animationGrid.appendChild(seriesCard);
         });
       } else {
@@ -810,11 +826,9 @@ function switchTab(tabId, containerId) {
 
 window.onload = () => {
   fetchSpotlightMoviesAndSeries();
-  fetchMovies();
   fetchSeries();
-  fetchPopularMovies();
-  fetchPopularSeries();
   fetchUpcomingMovies();
-  fetchAnimationTVShows();
+  fetchTopAiringAnimations()
+  fetchTrendingKseries();
   hideLoader();
 };

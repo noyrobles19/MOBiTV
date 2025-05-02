@@ -1,10 +1,8 @@
 
 const API_KEY = window.API_KIFE;
 
-const movieGrid = document.getElementById('movie-grid');
-const seriesGrid = document.getElementById('series-grid');
-const pmovieGrid = document.getElementById('pmovie-grid');
-const pseriesGrid = document.getElementById('pseries-grid');
+const movieGrid = document.getElementById('amovie-grid');
+const seriesGrid = document.getElementById('aseries-grid');
 const genreList = document.getElementById('genre-list');
 const modal = document.getElementById('modal');
 const modalPlayer = document.getElementById('modal-player');
@@ -14,15 +12,8 @@ const searchResults = document.getElementById('searchResults');
 const searchB = document.getElementById('searchBar-cont');
 const searchY = document.getElementById('searchy');
 
-searchY.onclick = () => {
-  document.getElementById('searchBar').classList.toggle('expanded');
-};
-
-//HOME >>>>>>>>>>>>>>>>>>>>>>>>>
-//TRENDING
-async function fetchMovies() {
-  //const response = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}`);
-  const response = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}`);
+async function fetchAnimationMovies() {
+  const response = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16`);
   const data = await response.json();
   
   data.results.forEach((movie) => {
@@ -37,182 +28,22 @@ async function fetchMovies() {
         <img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" alt="${movie.title}" class="movie-image">
         <div class="rating-container">
           <div class="star">${starRating}</div> <!-- Stars for rating -->
-          <div class="rating-number"> ${movie.vote_average.toFixed(1)}</div> <!-- Numeric score -->
+          <div class="rating-number">${movie.vote_average}</div> <!-- Numeric score -->
         </div>
       </div>
     `;
     
-    movieCard.onclick = () => watchNow(movie.id, 'movie');
+    movieCard.onclick = () => watchNow(movie.id, 'movie');;
     movieGrid.appendChild(movieCard);
   });
 }
 
-async function fetchSeries() {
-  //const response = await fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}`);
-  const response = await fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}`);
-  const data = await response.json();
+searchY.onclick = () => {
+  document.getElementById('searchBar').classList.toggle('expanded');
+};
 
-  seriesGrid.innerHTML = ''; // Clear previous content
-
-  data.results.forEach((series) => {
-    const seriesCard = document.createElement('div');
-    seriesCard.className = 'series-card';
-    
-    // Create star rating system based on series vote_average
-    const starRating = getStarRating(series.vote_average);
-
-    seriesCard.innerHTML = `
-      <div class="series-poster">
-        <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="series-image">
-        <div class="rating-container">
-          <div class="star">${starRating}</div>
-          <div class="rating-number"> ${series.vote_average}</div>
-        </div>
-      </div>
-    `;
-
-    seriesCard.onclick = () => watchNow(series.id, 'series');
-    seriesGrid.appendChild(seriesCard);
-  });
-}
-
-async function fetchPopularMovies() {
-  try {
-    const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`);
-    const data = await response.json();
-
-    if (!data.results) throw new Error("No results found");
-
-    let filteredMovies = data.results.filter(movie => movie.poster_path !== null);
-
-    // Fetch more pages if we don't have 20 valid movies
-    let page = 2;
-    while (filteredMovies.length < 20) {
-      const moreResponse = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=${page}`);
-      const moreData = await moreResponse.json();
-
-      if (!moreData.results.length) break; // Stop if no more movies
-
-      filteredMovies = [...filteredMovies, ...moreData.results.filter(movie => movie.poster_path !== null)];
-      page++;
-    }
-
-    // Ensure only 20 movies are displayed
-    filteredMovies = filteredMovies.slice(0, 20);
-
-    filteredMovies.forEach((movie) => {
-      const movieCard = document.createElement('div');
-      movieCard.className = 'movie-card';
-
-      // Generate star rating
-      const starRating = getStarRating(movie.vote_average);
-
-      movieCard.innerHTML = `
-        <div class="movie-poster">
-          <img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" alt="${movie.title}" class="movie-image">
-          <div class="rating-container">
-            <div class="star">${starRating}</div> <!-- Stars for rating -->
-            <div class="rating-number">${movie.vote_average.toFixed(1)}</div> <!-- Numeric score -->
-          </div>
-        </div>
-      `;
-
-      movieCard.onclick = () => watchNow(movie.id, 'movie');
-      pmovieGrid.appendChild(movieCard);
-    });
-  } catch (error) {
-    console.error("Error fetching popular movies:", error);
-  }
-}
-
-async function fetchPopularSeries() {
-  try {
-    const response = await fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&language=en-US&page=1`);
-    const data = await response.json();
-
-    if (!data.results) throw new Error("No results found");
-
-    let filteredSeries = data.results.filter(series => series.poster_path !== null);
-
-    // Fetch more pages if we don't have 20 valid series
-    let page = 2;
-    while (filteredSeries.length < 20) {
-      const moreResponse = await fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&language=en-US&page=${page}`);
-      const moreData = await moreResponse.json();
-
-      if (!moreData.results.length) break; // Stop if no more series are available
-
-      filteredSeries = [...filteredSeries, ...moreData.results.filter(series => series.poster_path !== null)];
-      page++;
-    }
-
-    // Ensure only 20 series are displayed
-    filteredSeries = filteredSeries.slice(0, 20);
-
-    filteredSeries.forEach((series) => {
-      const seriesCard = document.createElement('div');
-      seriesCard.className = 'series-card';
-
-      // Generate star rating
-      const starRating = getStarRating(series.vote_average);
-
-      seriesCard.innerHTML = `
-        <div class="series-poster">
-          <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="series-image">
-          <div class="rating-container">
-            <div class="star">${starRating}</div> <!-- Stars for rating -->
-            <div class="rating-number">${series.vote_average.toFixed(1)}</div> <!-- Numeric score -->
-          </div>
-        </div>
-      `;
-
-      seriesCard.onclick = () => watchNow(series.id, 'series');
-      pseriesGrid.appendChild(seriesCard);
-    });
-  } catch (error) {
-    console.error("Error fetching popular series:", error);
-  }
-}
-
-//UPCOMING
-async function fetchUpcomingMovies() {
-  const response = await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`);
-  const data = await response.json();
   
-  const upcomingGrid = document.getElementById('upcoming-movies-grid');
-  upcomingGrid.innerHTML = ''; // Clear previous results
-
-  data.results.forEach((movie) => {
-    const movieCard = document.createElement('div');
-    movieCard.className = 'movie-card';
-
-    // Generate star rating based on movie vote_average
-    const starRating = getStarRating(movie.vote_average);
-
-    movieCard.innerHTML = `
-      <div class="movie-poster">
-        <img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" alt="${movie.title}" class="movie-image">
-        <div class="rating-container">
-          <div class="star">${starRating}</div>
-          <div class="rating-number">${movie.vote_average}</div>
-        </div>
-      </div>
-    `;
-
-    movieCard.onclick = () => watchNow(movie.id, 'movie');
-    upcomingGrid.appendChild(movieCard);
-  });
-}
-
-//HOME END >>>>>>>>>>>>>>>>>>>>
-
-// Function to generate star ratings based on vote_average
-function getStarRating(vote) {
-  const stars = Math.round(vote / 2); // Convert 10-point scale to 5-star scale
-  return '★'.repeat(stars) + '☆'.repeat(5 - stars);
-}
-  
-async function fetchTopAiringMovies() {
+  async function fetchTopAiringMovies() {
     const response = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}`);
     const data = await response.json();
   
@@ -241,10 +72,37 @@ async function fetchTopAiringMovies() {
     });
   }  
 
-// This function can open a modal or display movie details based on its ID
 
 // Call the function to fetch movies when the page loads
 fetchTopAiringMovies();
+
+async function fetchSeries() {
+    const response = await fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}`);
+    const data = await response.json();
+  
+    seriesGrid.innerHTML = ''; // Clear previous content
+  
+    data.results.forEach((series) => {
+      const seriesCard = document.createElement('div');
+      seriesCard.className = 'series-card';
+      
+      // Create star rating system based on series vote_average
+      const starRating = getStarRating(series.vote_average);
+  
+      seriesCard.innerHTML = `
+        <div class="series-poster">
+          <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="series-image">
+          <div class="rating-container">
+            <div class="star">${starRating}</div>
+            <div class="rating-number">${series.vote_average}</div>
+          </div>
+        </div>
+      `;
+  
+      seriesCard.onclick = () => watchNow(series.id, 'series');
+      seriesGrid.appendChild(seriesCard);
+    });
+  }
   
   // Function to fetch and display Top Airing TV Shows
   async function fetchTopAiringSeries() {
@@ -270,7 +128,7 @@ fetchTopAiringMovies();
           <div class="series-poster">
             <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="series-image">
             <div class="rating-container">
-              <div class="stars">${starRating}</div>
+              <div class="star">${starRating}</div>
               <div class="rating-number">${series.vote_average}</div>
             </div>
           </div>
@@ -308,13 +166,13 @@ fetchTopAiringMovies();
           <div class="series-poster">
             <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="series-image">
             <div class="rating-container">
-              <div class="stars">${starRating}</div>
+              <div class="star">${starRating}</div>
               <div class="rating-number">${series.vote_average}</div>
             </div>
           </div>
         `;
   
-        seriesCard.onclick = () => watchNow(series.id, 'series');
+        seriesCard.onclick = () => watchNow(series.id, 'series');;
         mostWatchedGrid.appendChild(seriesCard);
       });
     } catch (error) {
@@ -322,8 +180,8 @@ fetchTopAiringMovies();
     }
   }
 
-// Function to handle the modal (optional)
-// You can implement this to show more details about the series when clicked
+
+
 // Call the functions to load the data when the page loads
 fetchTopAiringSeries();
 fetchMostWatchedSeries();
@@ -453,26 +311,23 @@ searchBar.addEventListener('input', (e) => {
   }
 });
 
-
 let currentIndex = 0;
 let spotlightList = [];
 const contentElement = document.getElementById("spot-details");
 
-async function fetchSpotlightMoviesAndSeries() {
+async function fetchSpotlightAnimations() {
   try {
     // Fetching top-rated series and upcoming movies (or any other criteria you prefer)
-    const seriesResponse = await fetch(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}`);
-    const moviesResponse = await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`);
-
+    const seriesResponse = await fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=16&sort_by=popularity.desc`);
+    const moviesResponse = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16&sort_by=popularity.desc`);
+    
     const seriesData = await seriesResponse.json();
     const moviesData = await moviesResponse.json();
 
     // Combine series and movies into one list
     spotlightList = [...seriesData.results, ...moviesData.results];
-
-  // Remove 'show' class to restart animation
+    
     contentElement.classList.remove("show");
-
     // Shuffle the list
     shuffleArray(spotlightList);
     fadeIn(contentElement);
@@ -501,6 +356,7 @@ function fadeIn(element) {
     element.classList.add("show");
   }, 50); // Small delay to trigger CSS transition
 }
+
 // Shuffle function to randomize the order of the spotlight list
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -511,7 +367,7 @@ function shuffleArray(array) {
 
 function updateSpotlightContent() {
   if (spotlightList.length > 0) {
-    const spotlight = document.getElementById('spotlight');
+    const spotlight = document.getElementById('anim-spotlight');
     const spotlightTitle = document.getElementById('spotlight-title');
     const spotlightRating = document.getElementById('spotlight-rating');
     const spotlightReleaseDate = document.getElementById('spotlight-release-date');
@@ -542,14 +398,14 @@ function updateSpotlightContent() {
     spotlightButton.style.display = 'inline-block';  // Make sure the Watch Now button is visible
     
     spotlightButton.onclick = () => {
-      if (currentSpotlight.id) {
-        // Open movie or series modal based on type
-        if (currentSpotlight.title) {
-          watchNow(currentSpotlight.id, mediaType.toLowerCase());
-        } else {
-          watchNow(currentSpotlight.id, mediaType.toLowerCase());
+        if (currentSpotlight.id) {
+          // Open movie or series modal based on type
+          if (currentSpotlight.title) {
+            watchNow(currentSpotlight.id, mediaType.toLowerCase());
+          } else {
+            watchNow(currentSpotlight.id, mediaType.toLowerCase());
+          }
         }
-      }
     };
 
     // Set the background image for spotlight
@@ -567,6 +423,35 @@ window.onload = () => {
   fetchSpotlightMoviesAndSeries(); // Fetch movies and series for spotlight
 };
 
+async function fetchUpcomingMovies() {
+    const response = await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`);
+    const data = await response.json();
+    
+    const upcomingGrid = document.getElementById('upcoming-movies-grid');
+    upcomingGrid.innerHTML = ''; // Clear previous results
+  
+    data.results.forEach((movie) => {
+      const movieCard = document.createElement('div');
+      movieCard.className = 'movie-card';
+  
+      // Generate star rating based on movie vote_average
+      const starRating = getStarRating(movie.vote_average);
+  
+      movieCard.innerHTML = `
+        <div class="movie-poster">
+          <img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}" alt="${movie.title}" class="movie-image">
+          <div class="rating-container">
+            <div class="star">${starRating}</div>
+            <div class="rating-number">${movie.vote_average}</div>
+          </div>
+        </div>
+      `;
+  
+      movieCard.onclick = () => openMovieModal(movie.id);
+      upcomingGrid.appendChild(movieCard);
+    });
+  }
+  
 
 /// Fetch and display general Animation TV Shows
 async function fetchAnimationTVShows() {
@@ -578,8 +463,7 @@ async function fetchAnimationTVShows() {
       }
   
       const data = await response.json();
-      const animationGrid = document.getElementById('animation-tv-shows-grid');
-      animationGrid.innerHTML = ''; // Clear previous results
+      seriesGrid.innerHTML = ''; // Clear previous results
   
       if (data.results.length > 0) {
         data.results.forEach((series) => {
@@ -593,14 +477,14 @@ async function fetchAnimationTVShows() {
             <div class="movie-poster">
               <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="movie-image">
               <div class="rating-container">
-                <div class="stars">${starRating}</div>
+                <div class="star">${starRating}</div>
                 <div class="rating-number">${series.vote_average}</div>
               </div>
             </div>
           `;
   
           seriesCard.onclick = () => openSeriesModal(series.id); // Implement modal for series details
-          animationGrid.appendChild(seriesCard);
+          seriesGrid.appendChild(seriesCard);
         });
       } else {
         animationGrid.innerHTML = '<p>No animation TV shows available.</p>';
@@ -628,7 +512,7 @@ async function fetchAnimationTVShows() {
         data.results.forEach((series) => {
           const seriesCard = document.createElement('div');
           seriesCard.className = 'movie-card';
-  
+          const mediaType = series.title ? "movie" : "series";
           // Generate star rating based on series vote_average
           const starRating = getStarRating(series.vote_average);
   
@@ -636,13 +520,13 @@ async function fetchAnimationTVShows() {
             <div class="movie-poster">
               <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="movie-image">
               <div class="rating-container">
-                <div class="stars">${starRating}</div>
+                <div class="star">${starRating}</div>
                 <div class="rating-number">${series.vote_average}</div>
               </div>
             </div>
           `;
   
-          seriesCard.onclick = () => openSeriesModal(series.id); // Open modal on click
+          seriesCard.onclick = () => watchNow(series.id, mediaType); // Open modal on click
           animationGrid.appendChild(seriesCard);
         });
       } else {
@@ -674,18 +558,18 @@ async function fetchAnimationTVShows() {
   
           // Generate star rating based on series vote_average
           const starRating = getStarRating(series.vote_average);
-  
+          const mediaType = series.title ? "movie" : "series";
           seriesCard.innerHTML = `
             <div class="movie-poster">
               <img src="https://image.tmdb.org/t/p/w500/${series.poster_path}" alt="${series.name}" class="movie-image">
               <div class="rating-container">
-                <div class="stars">${starRating}</div>
+                <div class="star">${starRating}</div>
                 <div class="rating-number">${series.vote_average}</div>
               </div>
             </div>
           `;
   
-          seriesCard.onclick = () => openSeriesModal(series.id); // You can implement this modal logic
+          seriesCard.onclick = () => watchNow(series.id, mediaType); // You can implement this modal logic
           animationGrid.appendChild(seriesCard);
         });
       } else {
@@ -695,24 +579,7 @@ async function fetchAnimationTVShows() {
       console.error('Error fetching Animation TV shows:', error);
     }
   }
-  
-  // Helper function to generate star ratings based on the vote_average
-  // function getStarRating(voteAverage) {
-  //   const fullStars = Math.floor(voteAverage / 2);
-  //   const emptyStars = 5 - fullStars;
-    
-  //   let stars = '';
-    
-  //   for (let i = 0; i < fullStars; i++) {
-  //     stars += '<span class="star full">★</span>';
-  //   }
-    
-  //   for (let i = 0; i < emptyStars; i++) {
-  //     stars += '<span class="star empty">★</span>';
-  //   }
-    
-  //   return stars;
-  // }
+
 
 // document.addEventListener('contextmenu', function(event) {
 //   event.preventDefault();
@@ -723,6 +590,11 @@ async function fetchAnimationTVShows() {
 //       event.preventDefault();
 //   }
 // });
+
+function getStarRating(vote) {
+  const stars = Math.round(vote / 2); // Convert 10-point scale to 5-star scale
+  return '★'.repeat(stars) + '☆'.repeat(5 - stars);
+}
 
 // SEARCH ALL RESULTS
 function handleSearch() {
@@ -752,6 +624,7 @@ function hideLoader() {
     document.getElementById('loader').style.opacity = '0';
     setTimeout(() => {
       document.getElementById('loader').style.display = 'none';
+      document.getElementById('main-content').classList.remove('content-hidden');
     }, 300); // Delay for fade-out effect
   }, 2000); // Loader visible for only 1 second
 }
@@ -786,35 +659,26 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 console.log(localStorage.getItem("dark-mode"));
 
-//FOR TABBING Movie & Series
-function switchTab(tabId, containerId) {
-  const container = document.getElementById(containerId); // Scope to specific container
 
-  // Remove 'active' class from all contents inside this container
-  container.querySelectorAll('.content').forEach(content => {
+//FOR TABBING Movie & Series
+function switchTab(tabId) {
+  document.querySelectorAll('.content').forEach(content => {
       content.classList.remove('active');
   });
+  document.getElementById(tabId).classList.add('active');
 
-  // Activate the selected content
-  container.querySelector(`#${tabId}`).classList.add('active');
-
-  // Remove 'active' class from all tabs inside this container
-  container.querySelectorAll('.tab').forEach(tab => {
+  document.querySelectorAll('.tab').forEach(tab => {
       tab.classList.remove('active');
   });
-
-  // Activate the clicked tab
   event.target.classList.add('active');
 }
 
-
 window.onload = () => {
-  fetchSpotlightMoviesAndSeries();
-  fetchMovies();
-  fetchSeries();
-  fetchPopularMovies();
-  fetchPopularSeries();
-  fetchUpcomingMovies();
-  fetchAnimationTVShows();
-  hideLoader();
+  fetchSpotlightAnimations();
+  fetchTopRatedAnimations();
+  fetchTopAiringAnimations();
+  //fetchUpcomingMovies(); // Upcoming Movies section
+  fetchAnimationTVShows()
+  fetchAnimationMovies()
+  hideLoader()
 };
