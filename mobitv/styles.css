@@ -1707,7 +1707,7 @@ input:checked + .slider .icon-sun {
     }
   }
 
-/*background image here*/
+/*background image here
 .blurred-background {
   position: fixed; 
   top: 0;
@@ -1721,3 +1721,4 @@ input:checked + .slider .icon-sun {
   filter: blur(10px); 
   z-index: -1; 
 } 
+*/
