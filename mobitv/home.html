@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-site-verification" content="hUpOrZMJQV4YDn3m-7qMFvn5OA8yU5vkZm6ip9VJLpI">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>MoBiTV - Stream Movies & TV Series Anytime, Anywhere</title>
+  <meta name="description" content="Enjoy unlimited access to the latest movies and TV shows on MoBiTV. With a simple, fast, and hassle-free streaming experience, you can watch all your favorite films in high-quality without any sign-ups. Start streaming today and never miss out on the best entertainment!">
+  <meta name="keywords" content="alchemy of souls imdb, watch movies tv series online free, where can i watch movies and tv series for free, watch movies and tv series hd online free, watch movies and tv series online free, websites to watch tv series and movies for free, where can i watch movie for free online, watch movies and series for free reddit, soap2day watch movies and series in high quality, watch movies and series online free streaming">
+
+  <link rel="stylesheet" href="ostyles-1.css"> 
+  <link rel="preload" href="ostyles-1.css" as="styles">
+  <link rel="preload" href="scripts-1.js" as="scripts">
+  <script src="ghost-1.js"></script>
+  <link href="ajax/libs/font-awesome/6.0.0-beta3/css/all.min-1.css" rel="stylesheet">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="css2-2?family=Poppins&display=swap" rel="stylesheet">
+  <link rel="icon" href="bm_favicon-1.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="bm_favicon-1.png" sizes="16x16" type="image/png">
+</head>
+  
+  <body id="main-body" onload="hideLoader()">
+
+<!--   <body onload="hideLoader()"> -->
+
+    <!-- Fullscreen Loader -->
+    <div id="loader" class="fullscreen-loader">
+      <div class="spinner"></div>
+    </div>
+  
+    <div id="main-content">
+      <div class="blurred-background"></div>
+
+
+  
+      <!-- Spotlight Section -->
+      <section id="spotlight" class="spotlight">
+        <header class="spotlight-header">
+          <div class="logo">
+            <a href='index.html'><img src="bmb_logo-1.png" alt="Logo" id="logo"></a>
+        </div>
+        <div class="hamburger-menu" id="hamburger-menu">
+          <i class="fas fa-bars"></i> <!-- Hamburger Icon -->
+        </div>    
+        
+        <div class="navbar-links" id="navbar-links">
+          <a href='home.html'>Home</a>
+          <a href='movies.html'>Movies</a>
+          <a href='series.html'>TV Shows</a>
+          <a href='animations.html'>Animations</a><!-- Added attention link -->
+        </div>
+        
+          <div class="spacer"></div>  
+          <div class="navbar-links" id="rightNav">
+              <div class="search-container" id="searchBar-cont">
+                        <input type="text" id="searchBar" placeholder="Search here. ." oninput="searchMovies()">
+                        <div id="searchResults"></div>
+                    </div>  
+                    <i class="fa-solid fa-magnifying-glass" id="searchy"></i>
+                    <div id="toggle-cont">
+                      <label class="switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider">
+                          <!-- Sun Icon from Font Awesome -->
+                          <span class="icon-sun fas fa-sun"></span>
+                          <!-- Moon Icon from Font Awesome -->
+                          <span class="icon-crescent fas fa-moon"></span>
+                        </span>
+                      </label>      
+                </div>
+            </div>      
+             
+        </header>
+
+        <div class="spotlight-content fade-in show" id="spot-details">
+          <h1 id="spotlight-title">Spotlight Title</h1>
+          <div class="spotlight-details">
+            <span id="spotlight-rating" class="spotlight-rating-imdb"><i class="fas fa-star"></i> IMDb: 8.5</span>
+              <span id="spotlight-release-date">Release Date: 2024</span>
+              <span id="spotlight-mediatype">Movie</span>
+          </div>
+          <p id="spotlight-description">
+              This is the description of the spotlight movie or series. It highlights the most exciting features or storyline.
+          </p>
+          <button id="spotlight-button" onclick="openSpotlight()"><i class="fa-solid fa-circle-play"></i> Watch Now</button>
+          </div>   
+      </section>
+
+      <main>
+        <div id="trending">
+          <div class="tab-container">
+            <h2>Trending</h2>
+              <div class="switcher">
+                <div class="tab active" onclick="switchTab('container1', 'trending')">Movies</div>
+                <div class="tab" onclick="switchTab('container2', 'trending')">Series</div>
+              </div>
+          </div>
+          <div class="cons">
+            <div id="container1" class="content active">
+              <!-- Movies Section -->
+              <section id="movies">
+                <!-- The line will be added via CSS -->
+                <div class="movie-grid" id="movie-grid"></div>
+              </section>
+            </div>
+        
+            <div id="container2" class="content">
+              <!-- TV Series Section -->
+              <section id="series">
+                <div class="series-grid" id="series-grid"></div>
+              </section>
+            </div>  
+          </div>
+        </div>
+      </main>
+    <div id="popular">
+        <div class="tab-container">
+          <h2>Popular</h2>
+            <div class="switcher">
+              <div class="tab active" onclick="switchTab('container3', 'popular')">Movies</div>
+              <div class="tab" onclick="switchTab('container4', 'popular')">Series</div>
+            </div>
+        </div>
+        <div class="cons">
+          <div id="container3" class="content active">
+            <!-- Movies Section -->
+            <section id="pmovies">
+              <!-- The line will be added via CSS -->
+              <div class="movie-grid" id="pmovie-grid"></div>
+            </section>
+          </div>
+      
+          <div id="container4" class="content">
+            <!-- TV Series Section -->
+            <section id="pseries">
+              <div class="series-grid" id="pseries-grid"></div>
+            </section>
+          </div>  
+        </div>
+      </div>
+      <!-- Animation TV Shows Section -->
+      <div id="upcoming-movies">
+        <h2>Upcoming Movies</h2>
+        <div id="upcoming-movies-grid" class="movie-grid"></div>
+      </div>
+
+      <div id="disclaimer" class="disclaimer">
+          DISCLAIMER! <br>
+          This website's server has no files on it. Only content from third-party websites and services is displayed on this website. We have no control over or endorsement of any of the products, services, or material provided by these websites.
+      </div>
+      
+      <div class="copyright">
+        Copyright © MoBiTV 2025. All Rights Reserved.
+      </div>
+
+
+    </div>
+    
+    <script src="importme-1.js"></script>
+    <script src="scripts-1.js"></script>
+	  
+<!-- popcash.net pages.dev ads here -->
+<script type="text/javascript">
+   var uid = '286765';
+   var wid = '738847';
+   var pop_tag = document.createElement('script');pop_tag.src='//cdn.popcash.net/show.js';document.body.appendChild(pop_tag);
+   pop_tag.onerror = function() {pop_tag = document.createElement('script');pop_tag.src='//cdn2.popcash.net/show.js';document.body.appendChild(pop_tag)};
+</script>
+<!-- popcash.net ads end -->	
+
+
+	  
+  </body>
+</html>
